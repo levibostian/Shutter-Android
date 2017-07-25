@@ -1,19 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="com.levibostian.shutter_androidexample.MainActivity">
 
-    <TextView
+    <Button
+        android:id="@+id/main_activity_take_photo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        android:layout_margin="12dp"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/take_photo"/>
 
-</android.support.constraint.ConstraintLayout>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Where to save the photo to?"/>
+
+    <RadioGroup
+        android:id="@+id/main_activity_photo_save_location_radiogroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checkedButton="1">
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Internal private storage"/>
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="External private storage"/>
+    </RadioGroup>
+
+    <CheckBox
+        android:id="@+id/main_activity_add_photo_gallery_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add photo to gallery after capture?"/>
+
+    <EditText
+        android:id="@+id/main_activity_filename_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:lines="1"
+        android:hint="File name (leave blank for default)"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_margin="22dp"
+        android:background="@color/colorAccent">
+
+        <TextView
+            android:id="@+id/main_activity_photo_shown_here_textview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/photo_will_show_here_after_taken"
+            android:textColor="@android:color/white"
+            android:gravity="center"/>
+
+        <ImageView
+            android:id="@+id/main_activity_photo_taken_imageview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/main_activity_photo_taken_location_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"/>
+
+</LinearLayout>

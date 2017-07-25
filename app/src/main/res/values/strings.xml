@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Shutter-AndroidExample</string>
+    <string name="take_photo">Take photo</string>
+    <string name="photo_will_show_here_after_taken">Photo will show here after taken.</string>
 </resources>
