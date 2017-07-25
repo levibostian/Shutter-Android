@@ -16,13 +16,17 @@ import java.util.*
 class ShutterRecordVideoBuilder(val companion: Shutter.ShutterCompanion): ShutterResultListener {
 
     private var fileName: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-    private var directoryPath: File = companion.getContext()!!.filesDir
+    private var directoryPath: File
     private var addVidToGallery: Boolean = false
     private var resultCallback: ShutterResultCallback? = null
 
     private var fileAbsolutePath: String? = null
 
     private val RECORD_VIDEO_REQUEST_CODE = 0
+
+    init {
+        directoryPath = getDirectoryPathInternalPrivateStorage()
+    }
 
     /**
      * @param[name] Name to give for the file. By default, name is the date in the format: yyyyMMdd_HHmmss. *Note: filename cannot contain any characters not alphabetical or underscores.*
@@ -51,8 +55,12 @@ class ShutterRecordVideoBuilder(val companion: Shutter.ShutterCompanion): Shutte
      * @see usePrivateAppExternalStorage
      */
     fun usePrivateAppInternalStorage(): ShutterRecordVideoBuilder {
-        directoryPath = File("${companion.getContext()!!.filesDir.absolutePath}/Movies/")
+        directoryPath = getDirectoryPathInternalPrivateStorage()
         return this
+    }
+
+    private fun getDirectoryPathInternalPrivateStorage(): File {
+        return File("${companion.getContext()!!.filesDir.absolutePath}/Movies/")
     }
 
     /**
@@ -123,7 +131,7 @@ class ShutterRecordVideoBuilder(val companion: Shutter.ShutterCompanion): Shutte
     /**
      * In the Fragment or Activity that you provided to Shutter via it's constructor, call [onActivityResult] on the return value of [snap].
      */
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
         fun addVideoToPublicGallery() {
             val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
             val file = File(fileAbsolutePath)

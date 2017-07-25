@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
-    <files-path name="internal_files" path="Pictures/" />
-    <external-files-path name="external_files" path="Pictures/" />
+    <files-path name="internal_pictures_files" path="Pictures/" />
+    <external-files-path name="external_pictures_files" path="Pictures/" />
 
-    <files-path name="internal_files" path="Movies/" />
-    <external-files-path name="external_files" path="Movies/" />
+    <files-path name="internal_videos_files" path="Movies/" />
+    <external-files-path name="external_videos_files" path="Movies/" />
 </paths>

@@ -10,10 +10,13 @@ import com.levibostian.shutter_android.Shutter
 import com.levibostian.shutter_android.exception.ShutterUserCancelledOperation
 import com.levibostian.shutter_android.vo.ShutterResult
 import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ShutterTakePhotoBuilder(val companion: Shutter.ShutterCompanion): ShutterResultListener {
+class ShutterPickPhotoGalleryBuilder(val companion: Shutter.ShutterCompanion): ShutterResultListener {
 
     private var fileName: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
     private var directoryPath: File
@@ -33,7 +36,7 @@ class ShutterTakePhotoBuilder(val companion: Shutter.ShutterCompanion): ShutterR
      *
      * @throws IllegalArgumentException If filename contains characters that are not alphabetical and underscores.
      */
-    fun filename(name: String): ShutterTakePhotoBuilder {
+    fun filename(name: String): ShutterPickPhotoGalleryBuilder {
         if (isValidFilename(name)) this.fileName = name
         return this
     }
@@ -54,7 +57,7 @@ class ShutterTakePhotoBuilder(val companion: Shutter.ShutterCompanion): ShutterR
      *
      * @see usePrivateAppExternalStorage
      */
-    fun usePrivateAppInternalStorage(): ShutterTakePhotoBuilder {
+    fun usePrivateAppInternalStorage(): ShutterPickPhotoGalleryBuilder {
         directoryPath = getDirectoryPathInternalPrivateStorage()
         return this
     }
@@ -70,21 +73,13 @@ class ShutterTakePhotoBuilder(val companion: Shutter.ShutterCompanion): ShutterR
      *
      * @see usePrivateAppInternalStorage
      */
-    fun usePrivateAppExternalStorage(): ShutterTakePhotoBuilder {
+    fun usePrivateAppExternalStorage(): ShutterPickPhotoGalleryBuilder {
         directoryPath = companion.getContext()!!.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return this
     }
 
-    /**
-     * If you wish to add your captured photo to the Gallery on the user's device.
-     */
-    fun addPhotoToGallery(): ShutterTakePhotoBuilder {
-        addPicToGallery = true
-        return this
-    }
-
     // for now, we are removing this. it requires read/write permissions and we do not want to have the user require that.
-//        fun usePublicExternalStorage(): ShutterTakePhotoBuilder {
+//        fun usePublicExternalStorage(): ShutterPickPhotoGalleryBuilder {
 //            directoryPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
 //            return this
 //        }
@@ -97,33 +92,17 @@ class ShutterTakePhotoBuilder(val companion: Shutter.ShutterCompanion): ShutterR
             return this
         }
 
-        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        if (takePictureIntent.resolveActivity(companion.getContext()!!.packageManager) == null) {
-            callback.onError("You do not have an app installed on your device to take a photo.", RuntimeException("User does not have app installed on device to take a photo."))
+        val getPhotoGalleryIntent = Intent(Intent.ACTION_PICK)
+        getPhotoGalleryIntent.type = "image/*"
+        if (getPhotoGalleryIntent.resolveActivity(companion.getContext()!!.packageManager) == null) {
+            callback.onError("You do not have an app installed on your device view photos.", RuntimeException("You do not have an app installed on your device view photos."))
             return this
         }
 
-        val nameOfApp = companion.getContext()!!.packageName.split(".").last()
-        directoryPath = File("${directoryPath.absolutePath}/$nameOfApp")
-        directoryPath.mkdirs()
-
-        val imageFile: File = File(directoryPath, fileName + ".jpg")
-
-        if (!imageFile.createNewFile()) {
-            callback.onError("Error taking image.", RuntimeException("Error creating new image where image will save: ${directoryPath.absolutePath} with filename: $fileName"))
-            return this
-        }
-
-        fileAbsolutePath = imageFile.absolutePath
-
-        val takePhotoDestinationContentUri: Uri = FileProvider.getUriForFile(companion.getContext()!!, "${companion.getContext()!!.packageName}.fileprovider", imageFile)
-
-        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, takePhotoDestinationContentUri)
-
-        companion.activity?.startActivityForResult(takePictureIntent, TAKE_PHOTO_REQUEST_CODE)
-        companion.appCompatActivity?.startActivityForResult(takePictureIntent, TAKE_PHOTO_REQUEST_CODE)
-        companion.fragment?.startActivityForResult(takePictureIntent, TAKE_PHOTO_REQUEST_CODE)
-        companion.supportFragment?.startActivityForResult(takePictureIntent, TAKE_PHOTO_REQUEST_CODE)
+        companion.activity?.startActivityForResult(getPhotoGalleryIntent, TAKE_PHOTO_REQUEST_CODE)
+        companion.appCompatActivity?.startActivityForResult(getPhotoGalleryIntent, TAKE_PHOTO_REQUEST_CODE)
+        companion.fragment?.startActivityForResult(getPhotoGalleryIntent, TAKE_PHOTO_REQUEST_CODE)
+        companion.supportFragment?.startActivityForResult(getPhotoGalleryIntent, TAKE_PHOTO_REQUEST_CODE)
 
         return this
     }
@@ -132,20 +111,53 @@ class ShutterTakePhotoBuilder(val companion: Shutter.ShutterCompanion): ShutterR
      * In the Fragment or Activity that you provided to Shutter via it's constructor, call [onActivityResult] on the return value of [snap].
      */
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
-        fun addPhotoToPublicGallery() {
-            val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
-            val file = File(fileAbsolutePath)
-            val contentUri = Uri.fromFile(file)
-            mediaScanIntent.data = contentUri
-            companion.getContext()?.sendBroadcast(mediaScanIntent)
-        }
-
         if (requestCode == TAKE_PHOTO_REQUEST_CODE) {
             if (resultCode != Activity.RESULT_OK) {
                 resultCallback?.onError("You cancelled taking a photo.", ShutterUserCancelledOperation("User cancelled taking a photo."))
             }
 
-            if (addPicToGallery) addPhotoToPublicGallery()
+            val contentUriPhoto = intent!!.data
+            val photoInputStream = companion.getContext()!!.contentResolver.openInputStream(contentUriPhoto)
+
+            if (android.os.Environment.getExternalStorageState() != android.os.Environment.MEDIA_MOUNTED) {
+                resultCallback?.onError("Error getting image from gallery. Unmount for device external storage and try again.", RuntimeException("User has mounted their device storage: ${directoryPath.absolutePath} with filename: $fileName"))
+                return true
+            }
+
+            var outputStream: OutputStream? = null
+            try {
+                val nameOfApp = companion.getContext()!!.packageName.split(".").last()
+                directoryPath = File("${directoryPath.absolutePath}/$nameOfApp")
+                directoryPath.mkdirs()
+
+                val imageFile: File = File(directoryPath, fileName + ".jpg")
+
+                if (!imageFile.createNewFile()) {
+                    resultCallback?.onError("Error getting image from gallery.", RuntimeException("Error creating new image where image will save: ${directoryPath.absolutePath} with filename: $fileName"))
+                    return true
+                }
+
+                fileAbsolutePath = imageFile.absolutePath
+
+                outputStream = FileOutputStream(imageFile)
+
+                val bytes = ByteArray(1024)
+                var read = photoInputStream!!.read(bytes)
+                while (read != -1) {
+                    outputStream.write(bytes, 0, read)
+                    read = photoInputStream.read(bytes)
+                }
+            } catch (e: IOException) {
+                resultCallback?.onError("Error getting image from gallery.", e)
+            } finally {
+                try {
+                    photoInputStream?.close()
+                    // outputStream?.flush()
+                    outputStream?.close()
+                } catch (e: IOException) {
+                    resultCallback?.onError("Error getting image from gallery.", e)
+                }
+            }
 
             resultCallback?.onComplete(ShutterResult(fileAbsolutePath))
 

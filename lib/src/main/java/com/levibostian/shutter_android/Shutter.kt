@@ -12,6 +12,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import android.support.v4.content.FileProvider
+import com.levibostian.shutter_android.builder.ShutterPickPhotoGalleryBuilder
 import com.levibostian.shutter_android.builder.ShutterRecordVideoBuilder
 import com.levibostian.shutter_android.builder.ShutterTakePhotoBuilder
 import com.levibostian.shutter_android.exception.ShutterUserCancelledOperation
@@ -60,6 +61,10 @@ open class Shutter private constructor() {
 
         fun recordVideo(): ShutterRecordVideoBuilder {
             return ShutterRecordVideoBuilder(this)
+        }
+
+        fun getPhotoFromGallery(): ShutterPickPhotoGalleryBuilder {
+            return ShutterPickPhotoGalleryBuilder(this)
         }
 
         fun getContext(): Context? = fragment?.activity ?: supportFragment?.activity ?: activity ?: appCompatActivity

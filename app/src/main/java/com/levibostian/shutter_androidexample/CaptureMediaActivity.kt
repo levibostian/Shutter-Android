@@ -14,7 +14,7 @@ import com.levibostian.shutter_android.Shutter
 import com.levibostian.shutter_android.builder.ShutterResultCallback
 import com.levibostian.shutter_android.builder.ShutterResultListener
 import com.levibostian.shutter_android.vo.ShutterResult
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_capture_media.*
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.source.ExtractorMediaSource
@@ -24,8 +24,13 @@ import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 
+class CaptureMediaActivity : AppCompatActivity() {
 
-class MainActivity : AppCompatActivity() {
+    companion object {
+        @JvmStatic fun getIntent(context: Context): Intent {
+            return Intent(context, CaptureMediaActivity::class.java)
+        }
+    }
 
     private val INTERNAL_PRIVATE_RADIO_INDEX = 1
     private val EXTERNAL_PRIVATE_RADIO_INDEX = 2
@@ -37,7 +42,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_capture_media)
 
         setupViews()
     }
@@ -49,11 +54,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupViews() {
-        main_activity_take_photo.setOnClickListener {
+        capture_media_activity_take_photo.setOnClickListener {
             var shutterBuilder = Shutter.with(this)
                     .takePhoto()
 
-            when (main_activity_photo_save_location_radiogroup.checkedRadioButtonId) {
+            when (capture_media_activity_photo_save_location_radiogroup.checkedRadioButtonId) {
                 INTERNAL_PRIVATE_RADIO_INDEX -> {
                     shutterBuilder = shutterBuilder.usePrivateAppInternalStorage()
                 }
@@ -62,14 +67,14 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            if (main_activity_add_photo_gallery_checkbox.isChecked) shutterBuilder = shutterBuilder.addPhotoToGallery()
+            if (capture_media_activity_add_photo_gallery_checkbox.isChecked) shutterBuilder = shutterBuilder.addPhotoToGallery()
 
-            val userGivenFilename = main_activity_filename_edittext.text.toString()
+            val userGivenFilename = capture_media_activity_filename_edittext.text.toString()
             if (!userGivenFilename.isEmpty()) {
                 if (shutterBuilder.isValidFilename(userGivenFilename)) {
                     shutterBuilder = shutterBuilder.filename(userGivenFilename)
                 } else {
-                    main_activity_filename_edittext.error = "You did not enter a valid filename."
+                    capture_media_activity_filename_edittext.error = "You did not enter a valid filename."
                     return@setOnClickListener
                 }
             }
@@ -77,27 +82,27 @@ class MainActivity : AppCompatActivity() {
             shutterResultListener = shutterBuilder.snap(object : ShutterResultCallback {
                 override fun onComplete(result: ShutterResult) {
                     Log.d("SHUTTER_EXAMPLE_APP", "Image taken to path: ${result.absoluteFilePath}")
-                    Glide.with(this@MainActivity)
+                    Glide.with(this@CaptureMediaActivity)
                             .load(result.absoluteFilePath)
-                            .into(main_activity_photo_taken_imageview)
+                            .into(capture_media_activity_photo_taken_imageview)
 
                     showImageView()
-                    main_activity_photo_taken_location_textview.text = "Photo saved to path: ${result.absoluteFilePath}"
-                    main_activity_photo_shown_here_textview.visibility = View.GONE
+                    capture_media_activity_photo_taken_location_textview.text = "Photo saved to path: ${result.absoluteFilePath}"
+                    capture_media_activity_photo_shown_here_textview.visibility = View.GONE
                 }
                 override fun onError(humanReadableErrorMessage: String, error: Throwable) {
                     Log.d("SHUTTER_EXAMPLE_APP", "Error encountered: ${error.message}")
                     Snackbar.make(findViewById(android.R.id.content), humanReadableErrorMessage, Snackbar.LENGTH_LONG).show()
-                    main_activity_photo_taken_location_textview.text = ""
+                    capture_media_activity_photo_taken_location_textview.text = ""
                 }
             })
         }
 
-        main_activity_record_video.setOnClickListener {
+        capture_media_activity_record_video.setOnClickListener {
             var shutterBuilder = Shutter.with(this)
                     .recordVideo()
 
-            when (main_activity_photo_save_location_radiogroup.checkedRadioButtonId) {
+            when (capture_media_activity_photo_save_location_radiogroup.checkedRadioButtonId) {
                 INTERNAL_PRIVATE_RADIO_INDEX -> {
                     shutterBuilder = shutterBuilder.usePrivateAppInternalStorage()
                 }
@@ -106,14 +111,14 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            if (main_activity_add_photo_gallery_checkbox.isChecked) shutterBuilder = shutterBuilder.addVideoToGallery()
+            if (capture_media_activity_add_photo_gallery_checkbox.isChecked) shutterBuilder = shutterBuilder.addVideoToGallery()
 
-            val userGivenFilename = main_activity_filename_edittext.text.toString()
+            val userGivenFilename = capture_media_activity_filename_edittext.text.toString()
             if (!userGivenFilename.isEmpty()) {
                 if (shutterBuilder.isValidFilename(userGivenFilename)) {
                     shutterBuilder = shutterBuilder.filename(userGivenFilename)
                 } else {
-                    main_activity_filename_edittext.error = "You did not enter a valid filename."
+                    capture_media_activity_filename_edittext.error = "You did not enter a valid filename."
                     return@setOnClickListener
                 }
             }
@@ -122,30 +127,30 @@ class MainActivity : AppCompatActivity() {
                 override fun onComplete(result: ShutterResult) {
                     Log.d("SHUTTER_EXAMPLE_APP", "Video recorded to path: ${result.absoluteFilePath}")
 
-                    exoPlayer = getMp4StreamingExoPlayer(this@MainActivity, result.mediaUri()!!)
-                    main_activity_photo_taken_videoview.player = exoPlayer
+                    exoPlayer = getMp4StreamingExoPlayer(this@CaptureMediaActivity, result.mediaUri()!!)
+                    capture_media_activity_photo_taken_videoview.player = exoPlayer
 
                     showVideoPlayer()
-                    main_activity_photo_taken_location_textview.text = "Video saved to path: ${result.absoluteFilePath}"
-                    main_activity_photo_shown_here_textview.visibility = View.GONE
+                    capture_media_activity_photo_taken_location_textview.text = "Video saved to path: ${result.absoluteFilePath}"
+                    capture_media_activity_photo_shown_here_textview.visibility = View.GONE
                 }
                 override fun onError(humanReadableErrorMessage: String, error: Throwable) {
                     Log.d("SHUTTER_EXAMPLE_APP", "Error encountered: ${error.message}")
                     Snackbar.make(findViewById(android.R.id.content), humanReadableErrorMessage, Snackbar.LENGTH_LONG).show()
-                    main_activity_photo_taken_location_textview.text = ""
+                    capture_media_activity_photo_taken_location_textview.text = ""
                 }
             })
         }
     }
 
     private fun showVideoPlayer() {
-        main_activity_photo_taken_videoview.visibility = View.VISIBLE
-        main_activity_photo_taken_imageview.visibility = View.GONE
+        capture_media_activity_photo_taken_videoview.visibility = View.VISIBLE
+        capture_media_activity_photo_taken_imageview.visibility = View.GONE
     }
 
     private fun showImageView() {
-        main_activity_photo_taken_videoview.visibility = View.GONE
-        main_activity_photo_taken_imageview.visibility = View.VISIBLE
+        capture_media_activity_photo_taken_videoview.visibility = View.GONE
+        capture_media_activity_photo_taken_imageview.visibility = View.VISIBLE
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

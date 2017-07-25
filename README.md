@@ -93,25 +93,25 @@ Inside of this file, add some entries depending on your situation.
 * If you are capturing an image using `.usePrivateAppInternalStorage()` add the following line between <paths> </paths>:
 
 ```
-<files-path name="internal_files" path="Pictures/" />
+<files-path name="internal_pictures_files" path="Pictures/" />
 ```
 
 * If you are capturing an image using `.usePrivateAppExternalStorage()` add the following line between <paths> </paths>:
 
 ```
-<external-files-path name="external_files" path="Pictures/" />
+<external-files-path name="external_pictures_files" path="Pictures/" />
 ```
 
 * If you are recording a video using `.usePrivateAppInternalStorage()` add the following line between <paths> </paths>:
 
 ```
-<files-path name="internal_files" path="Movies/" />
+<files-path name="internal_videos_files" path="Movies/" />
 ```
 
 * If you are recording a video using `.usePrivateAppExternalStorage()` add the following line between <paths> </paths>:
 
 ```
-<external-files-path name="external_files" path="Movies/" />
+<external-files-path name="external_videos_files" path="Movies/" />
 ```
 
 Here is an example `file_paths.xml` file:
@@ -119,8 +119,8 @@ Here is an example `file_paths.xml` file:
 ```
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
-    <files-path name="internal_files" path="Pictures/" />
-    <external-files-path name="external_files" path="Movies/" />
+    <files-path name="internal_pictures_files" path="Pictures/" />
+    <external-files-path name="external_videos_files" path="Movies/" />
 </paths>
 ```
 

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.levibostian.shutter_androidexample.MainActivity">
+    tools:context="com.levibostian.shutter_androidexample.CaptureMediaActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,51 +15,47 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/main_activity_take_photo"
+            android:id="@+id/get_media_activity_get_photo_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="@string/take_photo"/>
+            android:text="Get photo"/>
 
         <Button
-            android:id="@+id/main_activity_record_video"
+            android:id="@+id/get_media_activity_get_video_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
             android:layout_gravity="center_horizontal"
-            android:text="Record video"/>
+            android:text="Get video"/>
     </LinearLayout>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Where to save the media to?"/>
+        android:text="Where to copy the media to?"/>
 
     <RadioGroup
-        android:id="@+id/main_activity_photo_save_location_radiogroup"
+        android:id="@+id/get_media_activity_photo_save_location_radiogroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:checkedButton="1">
+        android:checkedButton="@+id/get_media_activity_internal_radio">
 
         <RadioButton
+            android:id="@id/get_media_activity_internal_radio"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Internal private storage"/>
 
         <RadioButton
+            android:id="@+id/get_media_activity_external_radio"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="External private storage"/>
     </RadioGroup>
 
-    <CheckBox
-        android:id="@+id/main_activity_add_photo_gallery_checkbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Add media to gallery after capture?"/>
-
     <EditText
-        android:id="@+id/main_activity_filename_edittext"
+        android:id="@+id/get_media_activity_filename_edittext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:lines="1"
@@ -73,28 +69,28 @@
         android:background="@color/colorAccent">
 
         <TextView
-            android:id="@+id/main_activity_photo_shown_here_textview"
+            android:id="@+id/get_media_activity_photo_shown_here_textview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="@string/media_will_show_here_after_taken"
+            android:text="Media will show here after copied."
             android:textColor="@android:color/white"
             android:gravity="center"/>
 
         <com.google.android.exoplayer2.ui.SimpleExoPlayerView
-            android:id="@+id/main_activity_photo_taken_videoview"
+            android:id="@+id/get_media_activity_photo_taken_videoview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"/>
 
         <ImageView
-            android:id="@+id/main_activity_photo_taken_imageview"
+            android:id="@+id/get_media_activity_photo_taken_imageview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"/>
     </RelativeLayout>
 
     <TextView
-        android:id="@+id/main_activity_photo_taken_location_textview"
+        android:id="@+id/get_media_activity_photo_taken_location_textview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"/>

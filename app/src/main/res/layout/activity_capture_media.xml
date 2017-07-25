@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.levibostian.shutter_androidexample.CaptureMediaActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/capture_media_activity_take_photo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/take_photo"/>
+
+        <Button
+            android:id="@+id/capture_media_activity_record_video"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_gravity="center_horizontal"
+            android:text="Record video"/>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Where to save the media to?"/>
+
+    <RadioGroup
+        android:id="@+id/capture_media_activity_photo_save_location_radiogroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checkedButton="@+id/capture_media_activity_internal_radio">
+
+        <RadioButton
+            android:id="@id/capture_media_activity_internal_radio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Internal private storage"/>
+
+        <RadioButton
+            android:id="@+id/capture_media_activity_external_radio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="External private storage"/>
+    </RadioGroup>
+
+    <CheckBox
+        android:id="@+id/capture_media_activity_add_photo_gallery_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add media to gallery after capture?"/>
+
+    <EditText
+        android:id="@+id/capture_media_activity_filename_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:lines="1"
+        android:hint="File name (leave blank for default)"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_margin="22dp"
+        android:background="@color/colorAccent">
+
+        <TextView
+            android:id="@+id/capture_media_activity_photo_shown_here_textview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/media_will_show_here_after_taken"
+            android:textColor="@android:color/white"
+            android:gravity="center"/>
+
+        <com.google.android.exoplayer2.ui.SimpleExoPlayerView
+            android:id="@+id/capture_media_activity_photo_taken_videoview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"/>
+
+        <ImageView
+            android:id="@+id/capture_media_activity_photo_taken_imageview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"/>
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/capture_media_activity_photo_taken_location_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"/>
+
+</LinearLayout>
