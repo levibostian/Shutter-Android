@@ -3,14 +3,14 @@ It's finally easy to take photos/videos via camera or get photos/videos from gal
 
 ### What is Shutter?
 
-Shutter is an Android library to take photos, record videos ([coming soon](https://github.com/levibostian/Shutter-Android/issues/1)), pick images/videos from gallery ([coming soon](https://github.com/levibostian/Shutter-Android/issues/2)), with ease. I always have difficulty working with images/videos while developing Android apps *especially since file providers were added*.
+Shutter is an Android library to take photos, record videos, pick images/videos from gallery ([coming soon](https://github.com/levibostian/Shutter-Android/issues/2)), with ease. I always have difficulty working with images/videos while developing Android apps *especially since file providers were added*.
 
 ### Why use Shutter?
 
 * Less bugs. No more publishing apps and have your app crash on user's devices because of file permission issues you did not handle or boilerplate code you forgot to include (believe me, I have done this many times).
 * No more copy/paste of boilerplate code. Install lib, call Shutter, and be done.
 * Lightweight.
-* No Android runtime permissions needed. No need to ask for reading/writing files permissions. 
+* No Android runtime permissions needed. No need to ask for reading/writing files permissions.
 * Java and Kotlin support. Shutter-Android is written in Kotlin :)
 
 ## Install
@@ -80,23 +80,57 @@ Shutter-Android uses the [FileProvider API](https://developer.android.com/refere
 </application>
 ```
 
-Then, create a file: `app/src/main/res/xml/file_paths.xml` to specify permissions of the FileProvider API.
+Then, create a file: `app/src/main/res/xml/file_paths.xml` to specify permissions of the FileProvider API. For now, this is what the file contents should look like:
 
-If you call `.usePrivateAppInternalStorage()` while using Shutter, include `<files-path name="internal_files" path="Pictures/" />` in this `file_paths.xml` file. If you call `.usePrivateAppExternalStorage()` while using Shutter, include `<external-files-path name="external_files" path="Pictures/" />` in this `files_paths.xml` file.
+```
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+</paths>
+```
 
-Complete `file_paths.xml` file:
+Inside of this file, add some entries depending on your situation.
+
+* If you are capturing an image using `.usePrivateAppInternalStorage()` add the following line between <paths> </paths>:
+
+```
+<files-path name="internal_files" path="Pictures/" />
+```
+
+* If you are capturing an image using `.usePrivateAppExternalStorage()` add the following line between <paths> </paths>:
+
+```
+<external-files-path name="external_files" path="Pictures/" />
+```
+
+* If you are recording a video using `.usePrivateAppInternalStorage()` add the following line between <paths> </paths>:
+
+```
+<files-path name="internal_files" path="Movies/" />
+```
+
+* If you are recording a video using `.usePrivateAppExternalStorage()` add the following line between <paths> </paths>:
+
+```
+<external-files-path name="external_files" path="Movies/" />
+```
+
+Here is an example `file_paths.xml` file:
 
 ```
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
     <files-path name="internal_files" path="Pictures/" />
-    <external-files-path name="external_files" path="Pictures/" />
+    <external-files-path name="external_files" path="Movies/" />
 </paths>
 ```
 
 More info about how to specify permissions can be found in the [official docs](https://developer.android.com/reference/android/support/v4/content/FileProvider.html#SpecifyFiles)
 
 Done!
+
+## Author 
+
+* Levi Bostian [GitHub](https://github.com/levibostian), [Twitter](https://twitter.com/levibostian), [Website/blog](http://levibostian.com)
 
 **Notes/Warnings:**
 
