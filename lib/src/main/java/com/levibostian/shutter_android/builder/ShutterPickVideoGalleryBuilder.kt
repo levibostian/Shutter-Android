@@ -2,14 +2,12 @@ package com.levibostian.shutter_android.builder
 
 import android.app.Activity
 import android.content.Intent
+import android.os.AsyncTask
 import android.os.Environment
 import com.levibostian.shutter_android.Shutter
 import com.levibostian.shutter_android.exception.ShutterUserCancelledOperation
 import com.levibostian.shutter_android.vo.ShutterResult
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.OutputStream
+import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -133,41 +131,50 @@ class ShutterPickVideoGalleryBuilder(val companion: Shutter.ShutterCompanion): S
 
             fileAbsolutePath = videoFile.absolutePath
 
-            fun runOnUI(run: () -> Unit) {
-                companion.getActivity()!!.runOnUiThread {
-                    run.invoke()
-                }
-            }
-
-            Thread(Runnable {
-                var outputStream: OutputStream? = null
-                try {
-                    outputStream = FileOutputStream(videoFile)
-
-                    val bytes = ByteArray(1024)
-                    var read = videoInputStream!!.read(bytes)
-                    while (read != -1) {
-                        outputStream.write(bytes, 0, read)
-                        read = videoInputStream.read(bytes)
-                    }
-
-                    runOnUI { resultCallback?.onComplete(ShutterResult(fileAbsolutePath)) }
-                } catch (e: IOException) {
-                    runOnUI { resultCallback?.onError("Error getting video from gallery.", e) }
-                } finally {
-                    try {
-                        videoInputStream?.close()
-                        // outputStream?.flush()
-                        outputStream?.close()
-                    } catch (e: IOException) {
-                        runOnUI { resultCallback?.onError("Error getting video from gallery.", e) }
-                    }
-                }
-            }).start()
+            SaveVideoToFileAsyncTask().execute(SaveVideoToFileAsyncTaskData(videoFile, videoInputStream))
 
             return true
         } else {
             return false
+        }
+    }
+
+    private inner class SaveVideoToFileAsyncTaskData(val videoFile: File, val videoInputStream: InputStream)
+    private inner class SaveVideoToFileAsyncTask : AsyncTask<SaveVideoToFileAsyncTaskData, Int, ShutterResult?>() {
+        override fun doInBackground(vararg dataArray: SaveVideoToFileAsyncTaskData): ShutterResult? {
+            var outputStream: OutputStream? = null
+            val data: SaveVideoToFileAsyncTaskData = dataArray[0]
+            try {
+                outputStream = FileOutputStream(data.videoFile)
+
+                val bytes = ByteArray(1024)
+                var read = data.videoInputStream.read(bytes)
+                while (read != -1) {
+                    outputStream.write(bytes, 0, read)
+                    read = data.videoInputStream.read(bytes)
+                }
+
+                return ShutterResult(fileAbsolutePath)
+            } catch (e: IOException) {
+                resultCallback?.onError("Error getting video from gallery.", e)
+                return null
+            } finally {
+                try {
+                    data.videoInputStream.close()
+                    // outputStream?.flush()
+                    outputStream?.close()
+                } catch (e: IOException) {
+                    resultCallback?.onError("Error getting video from gallery.", e)
+                    return null
+                }
+            }
+        }
+
+        protected fun onProgressUpdate(vararg progress: Int) {
+        }
+
+        override fun onPostExecute(result: ShutterResult?) {
+            result?.let { resultCallback?.onComplete(it) }
         }
     }
 

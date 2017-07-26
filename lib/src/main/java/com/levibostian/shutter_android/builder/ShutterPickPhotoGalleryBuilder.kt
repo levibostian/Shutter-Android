@@ -6,12 +6,10 @@ import android.os.Environment
 import com.levibostian.shutter_android.Shutter
 import com.levibostian.shutter_android.exception.ShutterUserCancelledOperation
 import com.levibostian.shutter_android.vo.ShutterResult
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.*
+import android.os.AsyncTask
+import java.io.*
 
 class ShutterPickPhotoGalleryBuilder(val companion: Shutter.ShutterCompanion): ShutterResultListener {
 
@@ -133,41 +131,50 @@ class ShutterPickPhotoGalleryBuilder(val companion: Shutter.ShutterCompanion): S
 
             fileAbsolutePath = imageFile.absolutePath
 
-            fun runOnUI(run: () -> Unit) {
-                companion.getActivity()!!.runOnUiThread {
-                    run.invoke()
-                }
-            }
-
-            Thread(Runnable {
-                var outputStream: OutputStream? = null
-                try {
-                    outputStream = FileOutputStream(imageFile)
-
-                    val bytes = ByteArray(1024)
-                    var read = photoInputStream!!.read(bytes)
-                    while (read != -1) {
-                        outputStream.write(bytes, 0, read)
-                        read = photoInputStream.read(bytes)
-                    }
-
-                    runOnUI { resultCallback?.onComplete(ShutterResult(fileAbsolutePath)) }
-                } catch (e: IOException) {
-                    runOnUI { resultCallback?.onError("Error getting image from gallery.", e) }
-                } finally {
-                    try {
-                        photoInputStream?.close()
-                        // outputStream?.flush()
-                        outputStream?.close()
-                    } catch (e: IOException) {
-                        runOnUI { resultCallback?.onError("Error getting image from gallery.", e) }
-                    }
-                }
-            }).start()
+            SavePhotoToFileAsyncTask().execute(SavePhotoToFileAsyncTaskData(imageFile, photoInputStream))
 
             return true
         } else {
             return false
+        }
+    }
+
+    private inner class SavePhotoToFileAsyncTaskData(val imageFile: File, val photoInputStream: InputStream)
+    private inner class SavePhotoToFileAsyncTask : AsyncTask<SavePhotoToFileAsyncTaskData, Int, ShutterResult?>() {
+        override fun doInBackground(vararg dataArray: SavePhotoToFileAsyncTaskData): ShutterResult? {
+            var outputStream: OutputStream? = null
+            val data: SavePhotoToFileAsyncTaskData = dataArray[0]
+            try {
+                outputStream = FileOutputStream(data.imageFile)
+
+                val bytes = ByteArray(1024)
+                var read = data.photoInputStream.read(bytes)
+                while (read != -1) {
+                    outputStream.write(bytes, 0, read)
+                    read = data.photoInputStream.read(bytes)
+                }
+
+                return ShutterResult(fileAbsolutePath)
+            } catch (e: IOException) {
+                resultCallback?.onError("Error getting image from gallery.", e)
+                return null
+            } finally {
+                try {
+                    data.photoInputStream.close()
+                    // outputStream?.flush()
+                    outputStream?.close()
+                } catch (e: IOException) {
+                    resultCallback?.onError("Error getting image from gallery.", e)
+                    return null
+                }
+            }
+        }
+
+        protected fun onProgressUpdate(vararg progress: Int) {
+        }
+
+        override fun onPostExecute(result: ShutterResult?) {
+            result?.let { resultCallback?.onComplete(it) }
         }
     }
 

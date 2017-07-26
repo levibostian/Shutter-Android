@@ -1,4 +1,5 @@
 [![Release](https://jitpack.io/v/levibostian/Shutter-Android.svg)](https://jitpack.io/#levibostian/Shutter-Android)
+[![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/JStumpp/awesome-android/blob/master/readme.md#utility)
 
 # Shutter-Android
 It's finally easy to take photos/videos via camera or get photos/videos from gallery on Android.
@@ -36,7 +37,7 @@ Then, add the following to your project build.gradle file (app/build.gradle)
 
 ```
 dependencies {
-    compile 'com.github.levibostian:Shutter-Android:0.1.0'
+    compile 'com.github.levibostian:Shutter-Android:0.2.1'
 }
 ```
 (the latest release to date is version: [![Release](https://jitpack.io/v/levibostian/Shutter-Android.svg)](https://jitpack.io/#levibostian/Shutter-Android))
