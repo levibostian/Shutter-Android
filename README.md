@@ -1,15 +1,19 @@
+[![Release](https://jitpack.io/v/levibostian/Shutter-Android.svg)](https://jitpack.io/#levibostian/Shutter-Android)
+
 # Shutter-Android
 It's finally easy to take photos/videos via camera or get photos/videos from gallery on Android.
 
+![](meta/header.jpg)
+
 ### What is Shutter?
 
-Shutter is an Android library to take photos, record videos, pick images/videos from gallery ([coming soon](https://github.com/levibostian/Shutter-Android/issues/2)), with ease. I always have difficulty working with images/videos while developing Android apps *especially since file providers were added*.
+Shutter is an Android library to take photos, record videos, pick images/videos from gallery, with ease. I always have difficulty working with images/videos while developing Android apps *especially since file providers were added*.
 
 ### Why use Shutter?
 
-* Less bugs. No more publishing apps and have your app crash on user's devices because of file permission issues you did not handle or boilerplate code you forgot to include (believe me, I have done this many times).
-* No more copy/paste of boilerplate code. Install lib, call Shutter, and be done.
-* Lightweight.
+* Less bugs. No more publishing apps and have your app crash on a user's devices because of file permission issues you did not handle or boilerplate code you forgot to include (believe me, I have done this many times).
+* No more copy/paste of boilerplate code. Install lib, call Shutter, and be done across all of your apps.
+* Lightweight. [Check out the methods count here](http://www.methodscount.com/?lib=com.github.levibostian%3AShutter-Android%3A0.1.0)
 * No Android runtime permissions needed. No need to ask for reading/writing files permissions.
 * Java and Kotlin support. Shutter-Android is written in Kotlin :)
 
@@ -35,6 +39,7 @@ dependencies {
     compile 'com.github.levibostian:Shutter-Android:0.1.0'
 }
 ```
+(the latest release to date is version: [![Release](https://jitpack.io/v/levibostian/Shutter-Android.svg)](https://jitpack.io/#levibostian/Shutter-Android))
 
 ## Take images easily with Shutter
 
@@ -54,6 +59,8 @@ shutterResultListener = Shutter.with(this)
         }
 })
 ```
+
+If you want to record a video, use: `Shutter.with(this).recordVideo()`. Pick image from the device gallery, use: `Shutter.with(this).getPhotoFromGallery()`. Pick video from the device gallery, use: `Shutter.with(this).getVideoFromGallery()`.
 
 When you call `.snap()` to tell Shutter to take a photo, save the result object. You will need to call if on your Activity or Fragment's `onActivityResult()` call:
 
@@ -130,12 +137,14 @@ Done!
 
 ## Author 
 
-* Levi Bostian [GitHub](https://github.com/levibostian), [Twitter](https://twitter.com/levibostian), [Website/blog](http://levibostian.com)
+* Levi Bostian - [GitHub](https://github.com/levibostian), [Twitter](https://twitter.com/levibostian), [Website/blog](http://levibostian.com)
+
+![Levi Bostian image](https://gravatar.com/avatar/22355580305146b21508c74ff6b44bc5?s=250)
 
 **Notes/Warnings:**
 
 * The Shutter API might confuse you because you are able to save your captured media to "private internal or external storage" with the option to also "save the captured media to the gallery". This is true but not true.
-
+desi
 *TL;DR Your photos/videos captured with Shutter may be added to the public gallery on the Android device no matter how you setup Shutter.*
 
 Android is a fragmented operating system as we all know. Even if you decide to save your photos to private internal storage and not save to the gallery, your photo still *might* be saved to the gallery. Shutter has no control over this. Every user device will behave differently depending on the camera app that is installed. Shutter takes photos by using an Android Intent which asks a camera app on the user's device to take the photo for us. That camera app has the ability to do with your photo whatever it wishes after it is taken including but not limited to saving the photo to the public gallery.
@@ -143,6 +152,10 @@ Android is a fragmented operating system as we all know. Even if you decide to s
 The only way to enforce your photos are private to your app and your app only is to add the camera functionality to your own app which we will not be covering in Shutter at this time and probably never.
 
 "Why does shutter even give the ability to add the captured media to the public gallery if it might do it already?" you answered your own question there. *Might* is the keyword. Adding the ability to add the media to the gallery through Shutter is to assert it is added to the gallery even if the camera app decides not to when the photo/video is captured.
+
+* Create a loading UI while working with Shutter if you decide to show a photo/video after capturing it.
+
+Shutter does labor intensive tasks in a background thread. What this means is that your app will go back into focus right away after the device camera or gallery apps are launched but the photo/video may not be ready for you yet. Shutter will call the callback you give to `.snap()` when the photo/video is ready. When your app goes back into focus, I would make sure to have some sort of loading UI telling the user that you are loading the photo/video and it will be available shortly. Once the callback you send to `.snap()` is called with the file path or an error, then you can change your UI to show the video/image and hide the loading UI.
 
 ## Contribute
 

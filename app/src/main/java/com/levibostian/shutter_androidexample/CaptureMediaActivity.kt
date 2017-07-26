@@ -127,7 +127,7 @@ class CaptureMediaActivity : AppCompatActivity() {
                 override fun onComplete(result: ShutterResult) {
                     Log.d("SHUTTER_EXAMPLE_APP", "Video recorded to path: ${result.absoluteFilePath}")
 
-                    exoPlayer = getMp4StreamingExoPlayer(this@CaptureMediaActivity, result.mediaUri()!!)
+                    exoPlayer = ExoPlayerUtil.getMp4StreamingExoPlayer(this@CaptureMediaActivity, result.mediaUri()!!)
                     capture_media_activity_photo_taken_videoview.player = exoPlayer
 
                     showVideoPlayer()
@@ -157,24 +157,6 @@ class CaptureMediaActivity : AppCompatActivity() {
         if (!shutterResultListener!!.onActivityResult(requestCode, resultCode, data)) {
             super.onActivityResult(requestCode, resultCode, data)
         }
-    }
-
-    private fun getMp4StreamingExoPlayer(context: Context, videoUri: Uri): SimpleExoPlayer {
-        val bandwidthMeter = DefaultBandwidthMeter()
-        val videoTrackSelectionFactory = AdaptiveTrackSelection.Factory(bandwidthMeter)
-        val trackSelector = DefaultTrackSelector(videoTrackSelectionFactory)
-
-        val dataSourceFactory = DefaultDataSourceFactory(context, Util.getUserAgent(context, "Shutter-Android Example"), bandwidthMeter)
-        val extractorsFactory = DefaultExtractorsFactory()
-
-        // using the ExtractorMediaSource because it is best for mp4 videos.
-        val videoSource = ExtractorMediaSource(videoUri, dataSourceFactory, extractorsFactory, null, null)
-
-        val videoPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector)
-        videoPlayer.prepare(videoSource)
-        videoPlayer.playWhenReady = true
-
-        return videoPlayer
     }
 
 }

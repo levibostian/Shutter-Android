@@ -17,7 +17,7 @@ We always start with specifying what type of file we are saving to. Then, we put
 
 That directory requires permissions to save to. Because of that, I am not allowing it for now to ease of use.
 
-This is flexible, however, if we were to check permissions on the calling fragment/activity when `.snap()` is called to throw a runtime exception if the permissions do not exist.
+This is flexible, however, if we were to check permissions on the calling fragment/regularActivity when `.snap()` is called to throw a runtime exception if the permissions do not exist.
 
 # Did I not answer your question?
 

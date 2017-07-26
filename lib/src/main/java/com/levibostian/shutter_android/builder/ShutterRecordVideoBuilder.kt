@@ -120,7 +120,7 @@ class ShutterRecordVideoBuilder(val companion: Shutter.ShutterCompanion): Shutte
 
         recordVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, recordVideoDestinationContentUri)
 
-        companion.activity?.startActivityForResult(recordVideoIntent, RECORD_VIDEO_REQUEST_CODE)
+        companion.regularActivity?.startActivityForResult(recordVideoIntent, RECORD_VIDEO_REQUEST_CODE)
         companion.appCompatActivity?.startActivityForResult(recordVideoIntent, RECORD_VIDEO_REQUEST_CODE)
         companion.fragment?.startActivityForResult(recordVideoIntent, RECORD_VIDEO_REQUEST_CODE)
         companion.supportFragment?.startActivityForResult(recordVideoIntent, RECORD_VIDEO_REQUEST_CODE)

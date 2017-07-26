@@ -120,7 +120,7 @@ class ShutterTakePhotoBuilder(val companion: Shutter.ShutterCompanion): ShutterR
 
         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, takePhotoDestinationContentUri)
 
-        companion.activity?.startActivityForResult(takePictureIntent, TAKE_PHOTO_REQUEST_CODE)
+        companion.regularActivity?.startActivityForResult(takePictureIntent, TAKE_PHOTO_REQUEST_CODE)
         companion.appCompatActivity?.startActivityForResult(takePictureIntent, TAKE_PHOTO_REQUEST_CODE)
         companion.fragment?.startActivityForResult(takePictureIntent, TAKE_PHOTO_REQUEST_CODE)
         companion.supportFragment?.startActivityForResult(takePictureIntent, TAKE_PHOTO_REQUEST_CODE)

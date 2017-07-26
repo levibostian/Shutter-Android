@@ -13,7 +13,7 @@ import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ShutterPickPhotoGalleryBuilder(val companion: Shutter.ShutterCompanion): ShutterResultListener {
+class ShutterPickVideoGalleryBuilder(val companion: Shutter.ShutterCompanion): ShutterResultListener {
 
     private var fileName: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
     private var directoryPath: File
@@ -21,7 +21,7 @@ class ShutterPickPhotoGalleryBuilder(val companion: Shutter.ShutterCompanion): S
 
     private var fileAbsolutePath: String? = null
 
-    private val GET_PHOTO_REQUEST_CODE = 0
+    private val GET_VIDEO_REQUEST_CODE = 0
 
     init {
         directoryPath = getDirectoryPathInternalPrivateStorage()
@@ -32,7 +32,7 @@ class ShutterPickPhotoGalleryBuilder(val companion: Shutter.ShutterCompanion): S
      *
      * @throws IllegalArgumentException If filename contains characters that are not alphabetical and underscores.
      */
-    fun filename(name: String): ShutterPickPhotoGalleryBuilder {
+    fun filename(name: String): ShutterPickVideoGalleryBuilder {
         if (isValidFilename(name)) this.fileName = name
         return this
     }
@@ -53,13 +53,13 @@ class ShutterPickPhotoGalleryBuilder(val companion: Shutter.ShutterCompanion): S
      *
      * @see usePrivateAppExternalStorage
      */
-    fun usePrivateAppInternalStorage(): ShutterPickPhotoGalleryBuilder {
+    fun usePrivateAppInternalStorage(): ShutterPickVideoGalleryBuilder {
         directoryPath = getDirectoryPathInternalPrivateStorage()
         return this
     }
 
     private fun getDirectoryPathInternalPrivateStorage(): File {
-        return File("${companion.getContext()!!.filesDir.absolutePath}/Pictures/")
+        return File("${companion.getContext()!!.filesDir.absolutePath}/Movies/")
     }
 
     /**
@@ -69,14 +69,14 @@ class ShutterPickPhotoGalleryBuilder(val companion: Shutter.ShutterCompanion): S
      *
      * @see usePrivateAppInternalStorage
      */
-    fun usePrivateAppExternalStorage(): ShutterPickPhotoGalleryBuilder {
-        directoryPath = companion.getContext()!!.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+    fun usePrivateAppExternalStorage(): ShutterPickVideoGalleryBuilder {
+        directoryPath = companion.getContext()!!.getExternalFilesDir(Environment.DIRECTORY_MOVIES)
         return this
     }
 
     // for now, we are removing this. it requires read/write permissions and we do not want to have the user require that.
-//        fun usePublicExternalStorage(): ShutterPickPhotoGalleryBuilder {
-//            directoryPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+//        fun usePublicExternalStorage(): ShutterPickVideoGalleryBuilder {
+//            directoryPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)
 //            return this
 //        }
 
@@ -84,21 +84,21 @@ class ShutterPickPhotoGalleryBuilder(val companion: Shutter.ShutterCompanion): S
         this.resultCallback = callback
 
         if (!isValidFilename(fileName)) {
-            callback.onError("You did not enter a valid file name for the photo. Name must contain only alphanumeric characters and underscores.", RuntimeException("User entered invalid filename: $fileName it can only contain alphanumeric characters and underscores."))
+            callback.onError("You did not enter a valid file name for the video. Name must contain only alphanumeric characters and underscores.", RuntimeException("User entered invalid filename: $fileName it can only contain alphanumeric characters and underscores."))
             return this
         }
 
-        val getPhotoGalleryIntent = Intent(Intent.ACTION_PICK)
-        getPhotoGalleryIntent.type = "image/*"
-        if (getPhotoGalleryIntent.resolveActivity(companion.getContext()!!.packageManager) == null) {
-            callback.onError("You do not have an app installed on your device view photos.", RuntimeException("You do not have an app installed on your device view photos."))
+        val getVideoGalleryIntent = Intent(Intent.ACTION_PICK)
+        getVideoGalleryIntent.type = "video/*"
+        if (getVideoGalleryIntent.resolveActivity(companion.getContext()!!.packageManager) == null) {
+            callback.onError("You do not have an app installed on your device view videos.", RuntimeException("You do not have an app installed on your device view videos."))
             return this
         }
 
-        companion.regularActivity?.startActivityForResult(getPhotoGalleryIntent, GET_PHOTO_REQUEST_CODE)
-        companion.appCompatActivity?.startActivityForResult(getPhotoGalleryIntent, GET_PHOTO_REQUEST_CODE)
-        companion.fragment?.startActivityForResult(getPhotoGalleryIntent, GET_PHOTO_REQUEST_CODE)
-        companion.supportFragment?.startActivityForResult(getPhotoGalleryIntent, GET_PHOTO_REQUEST_CODE)
+        companion.regularActivity?.startActivityForResult(getVideoGalleryIntent, GET_VIDEO_REQUEST_CODE)
+        companion.appCompatActivity?.startActivityForResult(getVideoGalleryIntent, GET_VIDEO_REQUEST_CODE)
+        companion.fragment?.startActivityForResult(getVideoGalleryIntent, GET_VIDEO_REQUEST_CODE)
+        companion.supportFragment?.startActivityForResult(getVideoGalleryIntent, GET_VIDEO_REQUEST_CODE)
 
         return this
     }
@@ -107,16 +107,16 @@ class ShutterPickPhotoGalleryBuilder(val companion: Shutter.ShutterCompanion): S
      * In the Fragment or Activity that you provided to Shutter via it's constructor, call [onActivityResult] on the return value of [snap].
      */
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
-        if (requestCode == GET_PHOTO_REQUEST_CODE) {
+        if (requestCode == GET_VIDEO_REQUEST_CODE) {
             if (resultCode != Activity.RESULT_OK) {
-                resultCallback?.onError("You cancelled finding a photo.", ShutterUserCancelledOperation("User cancelled finding a photo from gallery."))
+                resultCallback?.onError("You cancelled finding a video.", ShutterUserCancelledOperation("User cancelled finding a video from gallery."))
             }
 
-            val contentUriPhoto = intent!!.data
-            val photoInputStream = companion.getContext()!!.contentResolver.openInputStream(contentUriPhoto)
+            val contentUriVideo = intent!!.data
+            val videoInputStream = companion.getContext()!!.contentResolver.openInputStream(contentUriVideo)
 
             if (android.os.Environment.getExternalStorageState() != android.os.Environment.MEDIA_MOUNTED) {
-                resultCallback?.onError("Error getting image from gallery. Unmount for device external storage and try again.", RuntimeException("User has mounted their device storage: ${directoryPath.absolutePath} with filename: $fileName"))
+                resultCallback?.onError("Error getting video from gallery. Unmount for device external storage and try again.", RuntimeException("User has mounted their device storage: ${directoryPath.absolutePath} with filename: $fileName"))
                 return true
             }
 
@@ -124,14 +124,14 @@ class ShutterPickPhotoGalleryBuilder(val companion: Shutter.ShutterCompanion): S
             directoryPath = File("${directoryPath.absolutePath}/$nameOfApp")
             directoryPath.mkdirs()
 
-            val imageFile: File = File(directoryPath, fileName + ".jpg")
+            val videoFile: File = File(directoryPath, fileName + ".mp4")
 
-            if (!imageFile.createNewFile()) {
-                resultCallback?.onError("Error getting image from gallery.", RuntimeException("Error creating new image where image will save: ${directoryPath.absolutePath} with filename: $fileName"))
+            if (!videoFile.createNewFile()) {
+                resultCallback?.onError("Error getting video from gallery.", RuntimeException("Error creating new video where video will save: ${directoryPath.absolutePath} with filename: $fileName"))
                 return true
             }
 
-            fileAbsolutePath = imageFile.absolutePath
+            fileAbsolutePath = videoFile.absolutePath
 
             fun runOnUI(run: () -> Unit) {
                 companion.getActivity()!!.runOnUiThread {
@@ -142,25 +142,25 @@ class ShutterPickPhotoGalleryBuilder(val companion: Shutter.ShutterCompanion): S
             Thread(Runnable {
                 var outputStream: OutputStream? = null
                 try {
-                    outputStream = FileOutputStream(imageFile)
+                    outputStream = FileOutputStream(videoFile)
 
                     val bytes = ByteArray(1024)
-                    var read = photoInputStream!!.read(bytes)
+                    var read = videoInputStream!!.read(bytes)
                     while (read != -1) {
                         outputStream.write(bytes, 0, read)
-                        read = photoInputStream.read(bytes)
+                        read = videoInputStream.read(bytes)
                     }
 
                     runOnUI { resultCallback?.onComplete(ShutterResult(fileAbsolutePath)) }
                 } catch (e: IOException) {
-                    runOnUI { resultCallback?.onError("Error getting image from gallery.", e) }
+                    runOnUI { resultCallback?.onError("Error getting video from gallery.", e) }
                 } finally {
                     try {
-                        photoInputStream?.close()
+                        videoInputStream?.close()
                         // outputStream?.flush()
                         outputStream?.close()
                     } catch (e: IOException) {
-                        runOnUI { resultCallback?.onError("Error getting image from gallery.", e) }
+                        runOnUI { resultCallback?.onError("Error getting video from gallery.", e) }
                     }
                 }
             }).start()

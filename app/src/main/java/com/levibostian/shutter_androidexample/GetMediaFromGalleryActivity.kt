@@ -88,6 +88,45 @@ class GetMediaFromGalleryActivity : AppCompatActivity() {
         }
 
         get_media_activity_get_video_button.setOnClickListener {
+            var shutterBuilder = Shutter.with(this)
+                    .getVideoFromGallery()
+
+            when (get_media_activity_photo_save_location_radiogroup.checkedRadioButtonId) {
+                INTERNAL_PRIVATE_RADIO_INDEX -> {
+                    shutterBuilder = shutterBuilder.usePrivateAppInternalStorage()
+                }
+                EXTERNAL_PRIVATE_RADIO_INDEX -> {
+                    shutterBuilder = shutterBuilder.usePrivateAppExternalStorage()
+                }
+            }
+
+            val userGivenFilename = get_media_activity_filename_edittext.text.toString()
+            if (!userGivenFilename.isEmpty()) {
+                if (shutterBuilder.isValidFilename(userGivenFilename)) {
+                    shutterBuilder = shutterBuilder.filename(userGivenFilename)
+                } else {
+                    get_media_activity_filename_edittext.error = "You did not enter a valid filename."
+                    return@setOnClickListener
+                }
+            }
+
+            shutterResultListener = shutterBuilder.snap(object : ShutterResultCallback {
+                override fun onComplete(result: ShutterResult) {
+                    Log.d("SHUTTER_EXAMPLE_APP", "Video recorded to path: ${result.absoluteFilePath}")
+
+                    exoPlayer = ExoPlayerUtil.getMp4StreamingExoPlayer(this@GetMediaFromGalleryActivity, result.mediaUri()!!)
+                    get_media_activity_photo_taken_videoview.player = exoPlayer
+
+                    showVideoPlayer()
+                    get_media_activity_photo_taken_location_textview.text = "Video copied to path: ${result.absoluteFilePath}"
+                    get_media_activity_photo_shown_here_textview.visibility = View.GONE
+                }
+                override fun onError(humanReadableErrorMessage: String, error: Throwable) {
+                    Log.d("SHUTTER_EXAMPLE_APP", "Error encountered: ${error.message}")
+                    Snackbar.make(findViewById(android.R.id.content), humanReadableErrorMessage, Snackbar.LENGTH_LONG).show()
+                    get_media_activity_photo_taken_location_textview.text = ""
+                }
+            })
         }
     }
 

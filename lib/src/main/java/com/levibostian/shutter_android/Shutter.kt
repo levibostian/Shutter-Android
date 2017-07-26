@@ -3,20 +3,11 @@ package com.levibostian.shutter_android
 import android.app.Activity
 import android.app.Fragment
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.os.Environment
-import android.provider.MediaStore
 import android.support.v7.app.AppCompatActivity
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.*
-import android.support.v4.content.FileProvider
 import com.levibostian.shutter_android.builder.ShutterPickPhotoGalleryBuilder
+import com.levibostian.shutter_android.builder.ShutterPickVideoGalleryBuilder
 import com.levibostian.shutter_android.builder.ShutterRecordVideoBuilder
 import com.levibostian.shutter_android.builder.ShutterTakePhotoBuilder
-import com.levibostian.shutter_android.exception.ShutterUserCancelledOperation
-import com.levibostian.shutter_android.vo.ShutterResult
 
 open class Shutter private constructor() {
 
@@ -36,7 +27,7 @@ open class Shutter private constructor() {
 
         var fragment: Fragment? = null
         var supportFragment: android.support.v4.app.Fragment? = null
-        var activity: Activity? = null
+        var regularActivity: Activity? = null
         var appCompatActivity: AppCompatActivity? = null
 
         constructor(fragment: Fragment) {
@@ -52,7 +43,7 @@ open class Shutter private constructor() {
         }
 
         constructor(activity: Activity) {
-            this.activity = activity
+            this.regularActivity = activity
         }
 
         fun takePhoto(): ShutterTakePhotoBuilder {
@@ -67,7 +58,13 @@ open class Shutter private constructor() {
             return ShutterPickPhotoGalleryBuilder(this)
         }
 
-        fun getContext(): Context? = fragment?.activity ?: supportFragment?.activity ?: activity ?: appCompatActivity
+        fun getVideoFromGallery(): ShutterPickVideoGalleryBuilder {
+            return ShutterPickVideoGalleryBuilder(this)
+        }
+
+        fun getContext(): Context? = getActivity()
+
+        fun getActivity(): Activity? = fragment?.activity ?: supportFragment?.activity ?: regularActivity ?: appCompatActivity
 
     }
 
