@@ -11,7 +11,7 @@ It's finally easy to take photos/videos via camera or get photos/videos from gal
 Shutter is an Android library to take photos, record videos, pick images/videos from gallery, with ease. I always have difficulty working with images/videos while developing Android apps *especially since file providers were added*.
 
 ### Why use Shutter?
-
+ShutterPickVideoGalleryBuilder.kt:113)
 * Less bugs. No more publishing apps and have your app crash on a user's devices because of file permission issues you did not handle or boilerplate code you forgot to include (believe me, I have done this many times).
 * No more copy/paste of boilerplate code. Install lib, call Shutter, and be done across all of your apps.
 * Lightweight. [Check out the methods count here](http://www.methodscount.com/?lib=com.github.levibostian%3AShutter-Android%3A0.1.0)

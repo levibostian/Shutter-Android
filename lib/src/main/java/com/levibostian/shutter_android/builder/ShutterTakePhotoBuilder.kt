@@ -143,6 +143,7 @@ class ShutterTakePhotoBuilder(val companion: Shutter.ShutterCompanion): ShutterR
         if (requestCode == TAKE_PHOTO_REQUEST_CODE) {
             if (resultCode != Activity.RESULT_OK) {
                 resultCallback?.onError("You cancelled taking a photo.", ShutterUserCancelledOperation("User cancelled taking a photo."))
+                return true
             }
 
             if (addPicToGallery) addPhotoToPublicGallery()

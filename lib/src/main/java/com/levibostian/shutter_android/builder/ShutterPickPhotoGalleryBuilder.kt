@@ -108,6 +108,7 @@ class ShutterPickPhotoGalleryBuilder(val companion: Shutter.ShutterCompanion): S
         if (requestCode == GET_PHOTO_REQUEST_CODE) {
             if (resultCode != Activity.RESULT_OK) {
                 resultCallback?.onError("You cancelled finding a photo.", ShutterUserCancelledOperation("User cancelled finding a photo from gallery."))
+                return true
             }
 
             val contentUriPhoto = intent!!.data

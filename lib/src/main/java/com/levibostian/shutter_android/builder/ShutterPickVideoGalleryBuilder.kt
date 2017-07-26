@@ -108,6 +108,7 @@ class ShutterPickVideoGalleryBuilder(val companion: Shutter.ShutterCompanion): S
         if (requestCode == GET_VIDEO_REQUEST_CODE) {
             if (resultCode != Activity.RESULT_OK) {
                 resultCallback?.onError("You cancelled finding a video.", ShutterUserCancelledOperation("User cancelled finding a video from gallery."))
+                return true
             }
 
             val contentUriVideo = intent!!.data

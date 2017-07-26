@@ -143,6 +143,7 @@ class ShutterRecordVideoBuilder(val companion: Shutter.ShutterCompanion): Shutte
         if (requestCode == RECORD_VIDEO_REQUEST_CODE) {
             if (resultCode != Activity.RESULT_OK) {
                 resultCallback?.onError("You cancelled recording a video.", ShutterUserCancelledOperation("User cancelled recording a video."))
+                return true
             }
 
             if (addVidToGallery) addVideoToPublicGallery()
